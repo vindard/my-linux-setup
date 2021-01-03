@@ -57,7 +57,12 @@ install_fish() {
 	mkdir -p $FISH
 	touch $FISH/config.fish
 	touch $HOME/.commonrc
-	echo "/bin/bash -c 'source $HOME/.commonrc'" >> $FISH/config.fish
+
+	SOURCE_CMD="/bin/bash -c 'source $HOME/.commonrc'"
+	if ! grep -q $SOURCE_CMD $FISH/config.fish; then
+		echo $SOURCE_CMD >> $FISH/config.fish
+	fi
+
 	unset FISH
 }
 
@@ -68,17 +73,23 @@ install_telegram() {
 }
 
 install_virtualbox() {
+	echo_label "Virtualbox"
+
 	# Switch to Method 3 here for latest: https://itsfoss.com/install-virtualbox-ubuntu/
 	sudo apt update && sudo apt install -y virtualbox
 }
 
 install_1password() {
+	echo_label "1password"
+
 	sudo apt-key --keyring /usr/share/keyrings/1password.gpg adv --keyserver keyserver.ubuntu.com --recv-keys 3FEF9748469ADBE15DA7CA80AC2D62742012EA22
 	echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/1password.gpg] https://downloads.1password.com/linux/debian edge main' | sudo tee /etc/apt/sources.list.d/1password.list
 	sudo apt update && sudo apt install -y 1password
 }
 
 install_sensors() {
+	echo_label "sensors"
+
 	sudo apt update && sudo apt install -y lm-sensors hddtemp
 	sudo sensors-detect
 
@@ -86,6 +97,8 @@ install_sensors() {
 }
 
 install_pyenv() {
+	echo_label "pyenv"
+
 	sudo apt update && sudo apt install -y \
 		make build-essential libssl-dev zlib1g-dev \
 		libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
@@ -95,15 +108,36 @@ install_pyenv() {
 
 	# Log script for manual double-check, optionally break function
 	# -> see 'https://github.com/pyenv/pyenv-installer' for script
-	SCRIPT="https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer"
+	SCRIPT="https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer"
+
+	PARENT_SCRIPT="https://pyenv.run"
+	echo && echo "Checking \$SCRIPT against parent script..."
+	if curl -s $PARENT_SCRIPT | grep -q $SCRIPT; then
+		echo "Check passed!"
+		echo
+	else
+		echo "Check failed, re-check and correct in script"
+		echo
+		echo "Exiting 'pyenv' install..."
+		echo
+		return 1
+	fi
+
 	echo "Fetching install script for check before running from '$SCRIPT'" && echo
+	echo
+	SEP="================================"
+	echo $SEP
 	curl -L $SCRIPT
+	echo $SEP
+	echo
 	read -p "Does script look ok to continue? (Y/n): " RESP
+	echo
 	if [[ $RESP == 'Y' ]] || [[ $RESP == 'y' ]]
 	then
 		echo "Starting 'pyenv' install"
 	else
 		echo "Skipping rest of 'pyenv' install"
+		echo
 		return 1
 	fi
 
@@ -151,6 +185,8 @@ test_lines() {
 }
 
 configure_git() {
+	echo_label "git configuration"
+
 	git config --global user.name "vindard"
 	git config --global user.email "17693119+vindard@users.noreply.github.com"
 }
@@ -160,6 +196,7 @@ add_ed25519_ssh_key() {
 
 	ssh-keygen -o -a 100 -t ed25519
 }
+
 
 # Run the installs
 
@@ -176,4 +213,3 @@ install_pyenv
 # add_ed25519_ssh_key
 
 # test_lines
-
