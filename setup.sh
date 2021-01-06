@@ -148,18 +148,20 @@ install_pyenv() {
 		cat << 'EOF' >> $HOME/.commonrc 
 
 # For pyenv
-case "$shell" in
-fish )
+# Comment one of the following blocks
+
+# if echo $SHELL | grep -q "/bash"
+# then
+# 	export PATH="$HOME/.pyenv/bin:$PATH"
+# 	eval "$(pyenv init -)"
+# 	eval "$(pyenv virtualenv-init -)"
+# fi
+
+if echo $SHELL | grep -q "/fish"
 	set -x PATH "$HOME/.pyenv/bin" $PATH
 	status --is-interactive; and . (pyenv init -|psub)
 	status --is-interactive; and . (pyenv virtualenv-init -|psub)
-	;;
-* )
-	export PATH="$HOME/.pyenv/bin:$PATH"
-	eval "$(pyenv init -)"
-	eval "$(pyenv virtualenv-init -)"
-	;;
-esac
+end
 EOF
 
 		echo "Reset shell to complete:"
@@ -185,19 +187,22 @@ test_lines() {
 	cat << 'EOF' >> $HOME/.commonrc 
 
 # For pyenv
-case "$shell" in
-fish )
+# Comment one of the following blocks
+
+# if echo $SHELL | grep -q "/bash"
+# then
+# 	export PATH="$HOME/.pyenv/bin:$PATH"
+# 	eval "$(pyenv init -)"
+# 	eval "$(pyenv virtualenv-init -)"
+# fi
+
+if echo $SHELL | grep -q "/fish"
 	set -x PATH "$HOME/.pyenv/bin" $PATH
 	status --is-interactive; and . (pyenv init -|psub)
 	status --is-interactive; and . (pyenv virtualenv-init -|psub)
-	;;
-* )
-	export PATH="$HOME/.pyenv/bin:$PATH"
-	eval "$(pyenv init -)"
-	eval "$(pyenv virtualenv-init -)"
-	;;
-esac
+end
 EOF
+
 }
 
 configure_git() {
