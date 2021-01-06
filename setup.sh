@@ -145,14 +145,22 @@ install_pyenv() {
 	if ! command -v pyenv >/dev/null 2>&1
 	then
 		curl -L $SCRIPT | bash && \
-		cat <<- 'EOF' >> $HOME/.commonrc 
+		cat << 'EOF' >> $HOME/.commonrc 
 
-		# For pyenv
-		export PATH="$HOME/.pyenv/bin:$PATH"
-		eval "$(pyenv init -)"
-		eval "$(pyenv virtualenv-init -)"
-
-		EOF
+# For pyenv
+case "$shell" in
+fish )
+	set -x PATH "$HOME/.pyenv/bin" $PATH
+	status --is-interactive; and . (pyenv init -|psub)
+	status --is-interactive; and . (pyenv virtualenv-init -|psub)
+	;;
+* )
+	export PATH="$HOME/.pyenv/bin:$PATH"
+	eval "$(pyenv init -)"
+	eval "$(pyenv virtualenv-init -)"
+	;;
+esac
+EOF
 
 		echo "Reset shell to complete:"
 		echo "\$ exec \"\$SHELL\""
@@ -174,14 +182,22 @@ install_pyenv() {
 }
 
 test_lines() {
-	cat <<- 'EOF' >> $HOME/.commonrc 
+	cat << 'EOF' >> $HOME/.commonrc 
 
-	# For pyenv
+# For pyenv
+case "$shell" in
+fish )
+	set -x PATH "$HOME/.pyenv/bin" $PATH
+	status --is-interactive; and . (pyenv init -|psub)
+	status --is-interactive; and . (pyenv virtualenv-init -|psub)
+	;;
+* )
 	export PATH="$HOME/.pyenv/bin:$PATH"
 	eval "$(pyenv init -)"
 	eval "$(pyenv virtualenv-init -)"
-
-	EOF
+	;;
+esac
+EOF
 }
 
 configure_git() {
@@ -208,7 +224,7 @@ add_ed25519_ssh_key() {
 # install_virtualbox
 # install_1password
 # install_sensors
-install_pyenv
+# install_pyenv
 # configure_git
 # add_ed25519_ssh_key
 
