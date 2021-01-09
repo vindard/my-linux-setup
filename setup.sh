@@ -109,6 +109,38 @@ install_sensors() {
 	sudo apt install -y psensor
 }
 
+install_docker() {
+	# Guide at: https://docs.docker.com/engine/install/ubuntu/
+	echo_label "Docker"
+
+	# Remove any earlier versions
+	sudo apt remove docker docker-engine docker.io containerd runc
+
+	sudo apt update && sudo apt install -y \
+		apt-transport-https \
+		ca-certificates \
+		curl \
+		gnupg-agent \
+		software-properties-common
+
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	# Check for fetched key (https://docs.docker.com/engine/install/ubuntu/)
+	sudo apt-key fingerprint 0EBFCD88
+
+	sudo add-apt-repository -y \
+		"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+		$(lsb_release -cs) \
+		stable"
+
+	sudo apt update && sudo apt install -y \
+		docker-ce \
+		docker-ce-cli \
+		containerd.io
+
+	echo && echo "Finished installing Docker, testing with 'hello world'..."
+	sudo docker run hello-world
+}
+
 install_pyenv() {
 	echo_label "pyenv"
 
@@ -240,6 +272,7 @@ add_ed25519_ssh_key() {
 # install_virtualbox
 # install_1password
 # install_sensors
+# install_docker
 # install_pyenv
 # configure_git
 # add_ed25519_ssh_key
