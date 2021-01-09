@@ -163,18 +163,15 @@ install_pyenv() {
 # For pyenv
 # Comment one of the following blocks
 
-# if echo $SHELL | grep -q "/bash"
-# then
-# 	export PATH="$HOME/.pyenv/bin:$PATH"
-# 	eval "$(pyenv init -)"
-# 	eval "$(pyenv virtualenv-init -)"
-# fi
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
-if echo $SHELL | grep -q "/fish"
-	set -x PATH "$HOME/.pyenv/bin" $PATH
-	status --is-interactive; and . (pyenv init -|psub)
-	status --is-interactive; and . (pyenv virtualenv-init -|psub)
-end
+# if echo $SHELL | grep -q "/fish"
+# 	set -x PATH "$HOME/.pyenv/bin" $PATH
+# 	status --is-interactive; and . (pyenv init -|psub)
+# 	status --is-interactive; and . (pyenv virtualenv-init -|psub)
+# end
 EOF
 
 		echo "Reset shell to complete:"
