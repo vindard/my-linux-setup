@@ -66,6 +66,19 @@ install_fish() {
 	unset FISH
 }
 
+install_zsh() {
+	echo_label "zsh"
+
+	sudo apt update && sudo apt install -y zsh
+
+	sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	# echo && echo "Enter the password for current user '$USER' to change shell to 'Zsh'"
+	# chsh -s $(which zsh)
+
+	git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+	sed -i -E "s/(^plugins=.*)\)/\1 zsh-autosuggestions)/g" $HOME/.zshrc
+}
+
 install_telegram() {
 	echo_label "Telegram"
 
@@ -225,6 +238,7 @@ add_ed25519_ssh_key() {
 # install_vscode
 # install_speedtest
 # install_fish
+# install_zsh
 # install_telegram
 # install_virtualbox
 # install_1password
