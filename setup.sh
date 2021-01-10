@@ -247,11 +247,27 @@ EOF
 
 }
 
+install_yubikey() {
+	# Followed guide at: https://blog.programster.org/yubikey-link-with-gpg
+	echo_label "Yubikey dependencies"
+
+	sudo apt update && sudo apt install -y \
+		pcscd \
+		scdaemon \
+		gnupg2
+		# pcsc-tools
+}
+
 configure_git() {
 	echo_label "git configuration"
 
 	git config --global user.name "vindard"
 	git config --global user.email "17693119+vindard@users.noreply.github.com"
+
+	echo
+	echo "To import 'hot' signing keys fetch the following file and run:"
+	echo "$ gpg --decrypt 8F95D90A-priv_subkeys-GHonly.gpg.asc | gpg --import"
+	echo "$ git config --global user.signingkey 1B005D838F95D90A"
 }
 
 add_ed25519_ssh_key() {
@@ -274,6 +290,7 @@ add_ed25519_ssh_key() {
 # install_sensors
 # install_docker
 # install_pyenv
+# install_yubikey
 # configure_git
 # add_ed25519_ssh_key
 
