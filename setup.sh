@@ -92,6 +92,28 @@ install_virtualbox() {
 	sudo apt update && sudo apt install -y virtualbox
 }
 
+install_vmware() {
+	echo_label "VMWare"
+
+	sudo apt update && sudo apt install -y \
+		build-essential
+
+	mkdir -p $HOME/Downloads
+	pushd $HOME/Downloads
+	wget \
+		--user-agent="Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0" \
+		https://www.vmware.com/go/getplayer-linux
+
+	chmod +x getplayer-linux
+	sudo ./getplayer-linux
+	popd
+
+	echo
+	echo "Open VMWare and make sure setup is complete in the UI"
+	echo "-----"
+	echo
+}
+
 install_1password() {
 	echo_label "1password"
 
@@ -286,6 +308,7 @@ add_ed25519_ssh_key() {
 # install_zsh
 # install_telegram
 # install_virtualbox
+# install_vmware
 # install_1password
 # install_sensors
 # install_docker
