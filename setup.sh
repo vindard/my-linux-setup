@@ -260,6 +260,15 @@ EOF
 	echo
 }
 
+install_thefuck() {
+	if pip3 > /dev/null 2>&1
+	then
+		pip3 install thefuck
+	else
+		echo "Please install python3 and pip3 before trying to install 'thefuck'"
+	fi
+}
+
 test_lines() {
 	cat << 'EOF' >> $HOME/.commonrc 
 
@@ -327,6 +336,7 @@ add_ed25519_ssh_key() {
 # install_sensors
 # install_docker
 # install_pyenv
+# install_thefuck
 # install_yubikey
 # configure_git
 # add_ed25519_ssh_key
