@@ -13,6 +13,7 @@ install_standard() {
 	sudo apt update && sudo apt install -y \
 		htop \
 		vim \
+		tree \
 		# jq \
 		git
 }
@@ -83,6 +84,18 @@ install_telegram() {
 	echo_label "Telegram"
 
 	sudo apt update && sudo apt install -y telegram-desktop
+}
+
+install_signal() {
+	echo_label "Signal Messenger"
+
+	wget -O- https://updates.signal.org/desktop/apt/keys.asc \
+		| sudo apt-key add -
+
+	echo "deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main" \
+		| sudo tee -a /etc/apt/sources.list.d/signal-xenial.list
+
+	sudo apt update && sudo apt install -y signal-desktop
 }
 
 install_virtualbox() {
@@ -307,6 +320,7 @@ add_ed25519_ssh_key() {
 # install_fish
 # install_zsh
 # install_telegram
+# install_signal
 # install_virtualbox
 # install_vmware
 # install_1password
