@@ -1,5 +1,14 @@
 #!/bin/bash
 
+check_dependency() {
+	for cmd in "$@"; do
+		if ! command -v $cmd >/dev/null 2>&1; then
+			echo "This script requires \"${cmd}\" to be installed"
+			return 1
+		fi
+	done
+}
+
 echo_label() {
 	echo && echo "Installing $1" && echo "---" && echo
 }
@@ -16,6 +25,20 @@ install_standard() {
 		tree \
 		# jq \
 		git
+}
+
+install_snap() {
+	echo_label "Snap"
+
+	sudo apt update && sudo apt install -y snapd
+	sudo snap install hello-world
+}
+
+install_flatpak() {
+	echo_label "Flatpak"
+
+	sudo add-apt-repository ppa:alexlarsson/flatpak
+	sudo apt update && sudo apt install -y flatpak
 }
 
 install_vscode() {
@@ -133,6 +156,19 @@ install_1password() {
 	sudo apt-key --keyring /usr/share/keyrings/1password.gpg adv --keyserver keyserver.ubuntu.com --recv-keys 3FEF9748469ADBE15DA7CA80AC2D62742012EA22
 	echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/1password.gpg] https://downloads.1password.com/linux/debian edge main' | sudo tee /etc/apt/sources.list.d/1password.list
 	sudo apt update && sudo apt install -y 1password
+}
+
+install_tor_browser() {
+	# Guide: https://itsfoss.com/install-tar-browser-linux/
+	if check_dependency flatpak
+	then
+		install_flatpak
+	fi
+
+	flatpak install -y flathub com.github.micahflee.torbrowser-launcher || \
+		echo "If download was interrupted run: '$ flatpak repair --user'"
+
+	flatpak run com.github.micahflee.torbrowser-launcher
 }
 
 install_sensors() {
@@ -302,6 +338,16 @@ install_yubikey() {
 		# pcsc-tools
 }
 
+install_slack() {
+	echo_label "Slack"
+
+	if ! check_dependency snap; then
+		install_snap
+	fi
+
+	sudo snap install slack --classic
+}
+
 configure_git() {
 	echo_label "git configuration"
 
@@ -333,11 +379,13 @@ add_ed25519_ssh_key() {
 # install_virtualbox
 # install_vmware
 # install_1password
+# install_tor_browser
 # install_sensors
 # install_docker
 # install_pyenv
 # install_thefuck
 # install_yubikey
+# install_slack
 # configure_git
 # add_ed25519_ssh_key
 
