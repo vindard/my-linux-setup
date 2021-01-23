@@ -13,6 +13,12 @@ echo_label() {
 	echo && echo "Installing $1" && echo "---" && echo
 }
 
+get_latest_release() {
+	curl --silent "https://api.github.com/repos/$1/releases/latest" | 	# Get latest release from GitHub api
+		grep '"tag_name":' |                                            # Get tag line
+		sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
+}
+
 install_standard() {
 	echo_label "standard tools"
 
@@ -180,6 +186,24 @@ install_sensors() {
 	sudo apt install -y psensor
 }
 
+install_docker_compose() {
+	echo_label "Docker Compose"
+
+	echo "Checking that Docker dependency is installed..."
+	if ! command -v "docker"
+	then
+		echo "Docker not found, install first and then retry"
+		return 1
+	fi
+
+	VERSION=$(get_latest_release "docker/compose")
+	URL="https://github.com/docker/compose/releases/download/$VERSION/docker-compose-$(uname -s)-$(uname -m)"
+
+	sudo curl -L $URL -o /usr/local/bin/docker-compose
+	sudo chmod +x /usr/local/bin/docker-compose
+	docker-compose --version
+}
+
 install_docker() {
 	# Guide at: https://docs.docker.com/engine/install/ubuntu/
 	echo_label "Docker"
@@ -210,6 +234,9 @@ install_docker() {
 
 	echo && echo "Finished installing Docker, testing with 'hello world'..."
 	sudo docker run hello-world
+
+	# Install docker-compose
+	install_docker_compose
 }
 
 install_pyenv() {
