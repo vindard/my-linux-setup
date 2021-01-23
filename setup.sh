@@ -235,6 +235,14 @@ install_docker() {
 	echo && echo "Finished installing Docker, testing with 'hello world'..."
 	sudo docker run hello-world
 
+	# Setup Docker permissions for local user
+	echo
+	echo "Setting up local user permissions for Docker..."
+	sudo groupadd docker
+	sudo usermod -aG docker ${USER}
+	su ${USER}
+	docker run hello-world
+
 	# Install docker-compose
 	install_docker_compose
 }
