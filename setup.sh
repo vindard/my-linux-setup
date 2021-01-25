@@ -29,7 +29,7 @@ install_standard() {
 		htop \
 		vim \
 		tree \
-		# jq \
+		jq \
 		git
 }
 
@@ -383,6 +383,14 @@ install_slack() {
 	sudo snap install slack --classic
 }
 
+install_keybase() {
+	curl --remote-name https://prerelease.keybase.io/keybase_amd64.deb
+	sudo apt install -y ./keybase_amd64.deb
+	run_keybase
+
+	rm keybase_amd64.deb
+}
+
 configure_git() {
 	echo_label "git configuration"
 
@@ -421,6 +429,7 @@ add_ed25519_ssh_key() {
 # install_thefuck
 # install_yubikey
 # install_slack
+# install_keybase
 # configure_git
 # add_ed25519_ssh_key
 
