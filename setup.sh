@@ -30,7 +30,10 @@ install_standard() {
 		vim \
 		tree \
 		jq \
-		git
+		git \
+		vnstat \
+		tmux \
+		nmap
 }
 
 install_snap() {
@@ -165,8 +168,10 @@ install_1password() {
 }
 
 install_tor_browser() {
+	echo_label "Tor Browser"
+
 	# Guide: https://itsfoss.com/install-tar-browser-linux/
-	if check_dependency flatpak
+	if ! check_dependency flatpak
 	then
 		install_flatpak
 	fi
@@ -175,6 +180,20 @@ install_tor_browser() {
 		echo "If download was interrupted run: '$ flatpak repair --user'"
 
 	flatpak run com.github.micahflee.torbrowser-launcher
+}
+
+install_obsidian() {
+	echo_label "Obsidian"
+
+	if ! check_dependency flatpak
+	then
+		install_flatpak
+	fi
+
+	flatpak install -y flathub md.obsidian.Obsidian || \
+		echo "If download was interrupted run: '$ flatpak repair --user'"
+
+	flatpak run md.obsidian.Obsidian
 }
 
 install_sensors() {
@@ -391,6 +410,79 @@ install_keybase() {
 	rm keybase_amd64.deb
 }
 
+install_rpi_imager() {
+	echo_label "RPi Imager"
+
+	if ! check_dependency snap; then
+		install_snap
+	fi
+
+	sudo snap install rpi-imager
+}
+
+install_vlc() {
+	echo_label "VLC Media Player"
+
+	if ! check_dependency snap; then
+		install_snap
+	fi
+
+	sudo snap install vlc
+}
+
+install_qbittorrent() {
+	echo_label "qbittorrent"
+
+	sudo apt update && sudo apt install -y qbittorrent
+}
+
+install_gparted() {
+	echo_label "GParted"
+
+	sudo apt update && sudo apt install -y gparted
+}
+
+install_noip() {
+	echo_label "No-IP DUC"
+
+	INSTALL_DIR=$HOME/Installs/noip
+	TAR_FILE=https://www.noip.com/client/linux/noip-duc-linux.tar.gz
+	LOCAL_FILE=noip-duc-linux.tar.gz
+
+	mkdir -p $INSTALL_DIR
+	pushd $INSTALL_DIR
+	wget -O $LOCAL_FILE $TAR_FILE
+	tar xvzf $LOCAL_FILE
+	rm $LOCAL_FILE
+
+	pushd $(ls)
+
+	# Make started to give some problems with a 'sprintf overflow'
+	# error; skipping seems ok
+	# sudo make
+
+	sudo make install
+
+	unset INSTALL_DIR
+	unset TAR_FILE
+	unset LOCAL_FILE
+
+	# Setup systemd service
+	echo "Setting up systemd service for noip duc"
+	LOCAL_SERVICE_FILE=/etc/systemd/system/noip2.service
+	NOIP_SERVICE_FILE=https://gist.githubusercontent.com/vindard/0205001d13665eff809c30c0fe9cf487/raw/05ef5777b0341337665e39afea22df62dd8c4106/noip2.service
+	sudo -O $LOCAL_SERVICE_FILE $NOIP_SERVICE_FILE
+
+	sudo systemctl enable noip2
+	sudo systemctl start noip2
+}
+
+install_chromium() {
+	echo_label "Chromium Browser"
+
+	sudo apt update && sudo apt install -y chromium-browser
+}
+
 configure_git() {
 	echo_label "git configuration"
 
@@ -401,6 +493,7 @@ configure_git() {
 	echo "To import 'hot' signing keys fetch the following file and run:"
 	echo "$ gpg --decrypt 8F95D90A-priv_subkeys-GHonly.gpg.asc | gpg --import"
 	echo "$ git config --global user.signingkey 1B005D838F95D90A"
+	echo "$ git config --global commit.gpgsign true"
 }
 
 add_ed25519_ssh_key() {
@@ -423,6 +516,7 @@ add_ed25519_ssh_key() {
 # install_vmware
 # install_1password
 # install_tor_browser
+# install_obsidian
 # install_sensors
 # install_docker
 # install_pyenv
@@ -430,6 +524,12 @@ add_ed25519_ssh_key() {
 # install_yubikey
 # install_slack
 # install_keybase
+# install_rpi_imager
+# install_vlc
+# install_gparted
+# install_noip
+# install_chromium
+# install_qbittorrent
 # configure_git
 # add_ed25519_ssh_key
 
