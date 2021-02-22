@@ -50,8 +50,13 @@ install_flatpak() {
 	sudo apt update && sudo apt install -y flatpak
 }
 
-install_vscode() {
-	echo_label "VSCode"
+install_vscode_apt() {
+	# Note: on my Pop!OS system when the app updated itself
+	#       via the Pop!_Shop it lost the 'code' binary
+	#       in the terminal, so I switched to installing
+	#       using Snap instead.
+
+	echo_label "VS Code (via apt)"
 
 	wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
 	sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
@@ -61,6 +66,16 @@ install_vscode() {
 	sudo apt install apt-transport-https
 	sudo apt update
 	sudo apt install code # or code-insiders
+}
+
+install_vscode_snap() {
+	echo_label "VS Code (via snap)"
+
+	if ! check_dependency snap; then
+		install_snap
+	fi
+
+	sudo snap install code --classic
 }
 
 install_speedtest() {
@@ -359,6 +374,58 @@ install_thefuck() {
 	fi
 }
 
+install_golang() {
+	echo_label "GoLang"
+
+	LATEST=$(REGEX=".*(go.*linux.*?gz).*"; curl -s https://golang.org/dl/ | grep -P $REGEX | sed -r "s/$REGEX/\1/" | head -n 1)
+
+	VERSION=1.16
+	ARCHITECTURE=linux-amd64
+	GO_TARFILE=go$VERSION.$ARCHITECTURE.tar.gz
+
+	echo "Installing '$GO_TARFILE' (latest is '$LATEST')"
+	read -p "Continue? (Y/n): " RESP
+	if ! [[ $RESP == 'Y' ]] && ! [[ $RESP == 'y' ]]; then
+		echo "Skipping GoLang install..."
+		return 1
+	fi
+
+	# Fetch tarfile
+	DOWNLOAD_DIR=$HOME/Downloads
+	mkdir -p $DOWNLOAD_DIR
+	pushd $DOWNLOAD_DIR > /dev/null
+	wget -c https://golang.org/dl/$GO_TARFILE
+
+	SHA256SUM=$(sha256sum $GO_TARFILE)
+	echo "Install file sha256sum:"
+	echo "$SHA256SUM"
+	echo
+
+	# Install tarfile by unpacking
+	sudo tar -C /usr/local -xzf $GO_TARFILE
+	rm $GO_TARFILE
+	popd > /dev/null
+
+	# Add binary to $PATH
+	COMMONRC=$HOME/.commonrc
+	if [ -f $COMMONRC ]; then
+		echo >> $COMMONRC
+		echo "# For GoLang" >> $COMMONRC
+		echo "export PATH=\$PATH:/usr/local/go/bin" >> $COMMONRC
+		echo >> $COMMONRC
+	else
+		echo "Add the following to your shell profile:"
+		echo "	export PATH=\$PATH:/usr/local/go/bin"
+		echo
+	fi
+
+	echo "Finished installing GoLang v$VERSION"
+
+	# To uninstall, simply delete the created directory '/usr/local/go' and
+	# remove the 'go' binary from being added to $PATH
+	# Instructions: https://golang.org/doc/manage-install#linux-mac-bsd
+}
+
 test_lines() {
 	cat << 'EOF' >> $HOME/.commonrc 
 
@@ -400,6 +467,16 @@ install_slack() {
 	fi
 
 	sudo snap install slack --classic
+}
+
+install_spotify() {
+	echo_label "Spotify"
+
+	if ! check_dependency snap; then
+		install_snap
+	fi
+
+	sudo snap install spotify
 }
 
 install_keybase() {
@@ -506,7 +583,8 @@ add_ed25519_ssh_key() {
 # Run the installs
 
 # install_standard
-# install_vscode
+# install_vscode_apt
+# install_vscode_snap
 # install_speedtest
 # install_fish
 # install_zsh
@@ -521,8 +599,10 @@ add_ed25519_ssh_key() {
 # install_docker
 # install_pyenv
 # install_thefuck
+# install_golang
 # install_yubikey
 # install_slack
+# install_spotify
 # install_keybase
 # install_rpi_imager
 # install_vlc
