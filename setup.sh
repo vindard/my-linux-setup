@@ -36,6 +36,22 @@ install_standard() {
 		nmap
 }
 
+install_extraction_tools() {
+	echo_label "extraction tools"
+
+	sudo apt update
+
+	# There are three 7zip packages in Ubuntu: p7zip, p7zip-full and p7zip-rar
+	#
+	# The difference between p7zip and p7zip-full is that p7zip is a lighter
+	# version providing support only for .7z while the full version provides
+	# support for more 7z compression algorithms (for audio files etc).
+	#
+	# The p7zip-rar package provides support for RAR files along with 7z.
+	# Source: https://itsfoss.com/use-7zip-ubuntu-linux/
+	sudo apt install -y p7zip-full p7zip-rar
+}
+
 install_snap() {
 	echo_label "Snap"
 
@@ -91,6 +107,14 @@ install_speedtest() {
 	# Example how to remove using apt-get
 	# sudo apt remove speedtest-cli
 	sudo apt install -y speedtest
+}
+
+install_magic_wormhole() {
+	echo_label "Magic Wormhole"
+
+	sudo apt update && \
+		sudo apt install -y \
+			magic-wormhole
 }
 
 install_fish() {
@@ -548,7 +572,7 @@ install_noip() {
 	echo "Setting up systemd service for noip duc"
 	LOCAL_SERVICE_FILE=/etc/systemd/system/noip2.service
 	NOIP_SERVICE_FILE=https://gist.githubusercontent.com/vindard/0205001d13665eff809c30c0fe9cf487/raw/05ef5777b0341337665e39afea22df62dd8c4106/noip2.service
-	sudo -O $LOCAL_SERVICE_FILE $NOIP_SERVICE_FILE
+	sudo wget -O $LOCAL_SERVICE_FILE $NOIP_SERVICE_FILE
 
 	sudo systemctl enable noip2
 	sudo systemctl start noip2
@@ -583,9 +607,11 @@ add_ed25519_ssh_key() {
 # Run the installs
 
 # install_standard
+# install_extraction_tools
 # install_vscode_apt
 # install_vscode_snap
 # install_speedtest
+# install_magic_wormhole
 # install_fish
 # install_zsh
 # install_telegram
