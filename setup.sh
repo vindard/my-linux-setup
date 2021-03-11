@@ -13,6 +13,43 @@ echo_label() {
 	echo && echo "Installing $1" && echo "---" && echo
 }
 
+append_to_file() {
+	if [[ -e $FILE ]]; then
+		for line in "$@"; do
+			if [[ -z $line ]] || ! sudo cat $FILE | grep -q "$line"; then
+				echo "$line" | sudo tee -a $FILE > /dev/null
+			fi
+		done
+
+		# Delete all trailing blank lines at end of file
+		# (https://unix.stackexchange.com/a/81687)
+		sudo sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $FILE
+		echo | sudo tee -a $FILE > /dev/null
+	else
+		echo "Cannot append to '$FILE', file does not exist"
+	fi
+}
+
+append_to_sources_list() {
+	FILE="/etc/apt/sources.list"
+	append_to_file "$@"
+}
+
+append_to_torrc() {
+	FILE="/etc/tor/torrc"
+	append_to_file "$@"
+}
+
+uncomment_torrc() {
+	FILE="/etc/tor/torrc"
+
+	for string in "$@"; do
+		sudo sed -i \
+			"s/#\s\?\($string\)/\1/g" \
+			$FILE
+	done
+}
+
 get_latest_release() {
 	curl --silent "https://api.github.com/repos/$1/releases/latest" | 	# Get latest release from GitHub api
 		grep '"tag_name":' |                                            # Get tag line
@@ -219,6 +256,44 @@ install_tor_browser() {
 		echo "If download was interrupted run: '$ flatpak repair --user'"
 
 	flatpak run com.github.micahflee.torbrowser-launcher
+}
+
+install_tor() {
+	echo_label "Tor daemon"
+
+	TOR_URL="https://deb.torproject.org/torproject.org"
+
+	append_to_sources_list \
+		"deb $TOR_URL buster main" \
+		"deb-src $TOR_URL buster main"
+
+	sudo apt update && sudo apt install -y \
+		dirmngr \
+		apt-transport-https
+
+	PGP_KEY="A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89"
+	curl $TOR_URL/$PGP_KEY.asc | gpg --import
+	gpg --export $PGP_KEY | sudo apt-key add -
+
+	sudo apt update && sudo apt install -y \
+		tor \
+		tor-arm
+
+	echo "Running '$ tor --version':"
+	tor --version
+
+	# 'torrc' edits from Raspibolt instructions
+	# - https://stadicus.github.io/RaspiBolt/raspibolt_69_tor.html
+
+	# echo "Editing '/etc/tor/torrc' file"
+	# uncomment_torrc \
+	# 	"ControlPort 9051" \
+	# 	"CookieAuthentication 1"
+	# append_to_torrc \
+	# 	"# Added from Raspibolt instructions" \
+	# 	"CookieAuthFileGroupReadable 1"
+
+	# sudo systemctl restart tor
 }
 
 install_obsidian() {
@@ -555,18 +630,7 @@ install_noip() {
 	wget -O $LOCAL_FILE $TAR_FILE
 	tar xvzf $LOCAL_FILE
 	rm $LOCAL_FILE
-
-	pushd $(ls)
-
-	# Make started to give some problems with a 'sprintf overflow'
-	# error; skipping seems ok
-	# sudo make
-
-	sudo make install
-
-	unset INSTALL_DIR
-	unset TAR_FILE
-	unset LOCAL_FILE
+sed: -e expression #1, char 26: invalid reference \1CAL_FILE
 
 	# Setup systemd service
 	echo "Setting up systemd service for noip duc"
@@ -576,6 +640,74 @@ install_noip() {
 
 	sudo systemctl enable noip2
 	sudo systemctl start noip2
+}
+
+install_expressvpn() {
+	echo "Follow instructions at https://www.expressvpn.com/support/vpn-setup/app-for-linux/#install"
+}
+
+install_wireguard() {
+	echo_label "Wireguard"
+
+	sudo apt update && sudo apt install -y wireguard
+
+	WIREGUARD_DIR=/etc/wireguard
+	echo
+	echo "Generating wireguard keys"
+	wg genkey | sudo tee $WIREGUARD_DIR/privatekey | wg pubkey | sudo tee $WIREGUARD_DIR/publickey
+	echo "Keys generated at $WIREGUARD_DIR"
+	echo "Finished installing wireguard, configure the 'wgo0.conf' file at $WIREGUARD_DIR to use"
+	echo
+}
+
+install_electrum() {
+	echo_label "Electrum"
+
+	# Fetch Thomas' pgp keys
+	echo "Fetching Thomas' PGP keys"
+	gpg --recv-keys \
+		--keyserver pgp.mit.edu \
+		6694D8DE7BE8EE5631BED9502BD5824B7F9470E6
+
+	# Fetch install files
+	VERSION=4.0.9
+	BASE_FILE=Electrum-$VERSION.tar.gz
+	wget https://download.electrum.org/$VERSION/$BASE_FILE
+	wget https://download.electrum.org/$VERSION/$BASE_FILE.asc
+	gpg --verify $BASE_FILE.asc
+
+	# Install dependencies
+	sudo apt update && sudo apt install -y \
+		python3-pyqt5 \
+		libsecp256k1-0 \
+		python3-cryptography
+
+	# Install python dependencies
+	sudo apt install -y \
+		python3-setuptools \
+		python3-pip
+
+	# Install Electrum from package using pip
+	python3 -m pip install --user $BASE_FILE
+
+	rm $BASE_FILE*
+	$HOME/.local/bin/electrum version --offline
+
+	# Add binary to $PATH
+	COMMONRC=$HOME/.commonrc
+	if [ -f $COMMONRC ]; then
+		echo >> $COMMONRC
+		echo "# For Electrum" >> $COMMONRC
+		echo "export PATH=\$PATH:$HOME/.local/bin" >> $COMMONRC
+		echo >> $COMMONRC
+	else
+		echo "Add the following to your shell profile:"
+		echo "	export PATH=\$PATH:$HOME/.local/bin"
+		echo
+	fi
+
+	echo
+	echo "Finished installing Electrum. Restart shell and check with '\$ electrum --version'" 
 }
 
 install_chromium() {
@@ -620,6 +752,7 @@ add_ed25519_ssh_key() {
 # install_vmware
 # install_1password
 # install_tor_browser
+# install_tor
 # install_obsidian
 # install_sensors
 # install_docker
@@ -634,7 +767,10 @@ add_ed25519_ssh_key() {
 # install_vlc
 # install_gparted
 # install_noip
+# install_expressvpn
+# install_wireguard
 # install_chromium
+# install_electrum
 # install_qbittorrent
 # configure_git
 # add_ed25519_ssh_key
