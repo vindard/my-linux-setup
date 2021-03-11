@@ -630,7 +630,18 @@ install_noip() {
 	wget -O $LOCAL_FILE $TAR_FILE
 	tar xvzf $LOCAL_FILE
 	rm $LOCAL_FILE
-sed: -e expression #1, char 26: invalid reference \1CAL_FILE
+
+	pushd $(ls)
+
+	# Make started to give some problems with a 'sprintf overflow'
+	# error; skipping seems ok
+	# sudo make
+
+	sudo make install
+
+	unset INSTALL_DIR
+	unset TAR_FILE
+	unset LOCAL_FILE
 
 	# Setup systemd service
 	echo "Setting up systemd service for noip duc"
