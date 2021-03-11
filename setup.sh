@@ -40,6 +40,11 @@ append_to_torrc() {
 	append_to_file "$@"
 }
 
+append_to_bash_aliases() {
+	FILE="$HOME/.bash_aliases"
+	append_to_file "$@"
+}
+
 uncomment_torrc() {
 	FILE="/etc/tor/torrc"
 
@@ -220,14 +225,14 @@ install_vmware() {
 		build-essential
 
 	mkdir -p $HOME/Downloads
-	pushd $HOME/Downloads
+	pushd $HOME/Downloads > /dev/null
 	wget \
 		--user-agent="Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0" \
 		https://www.vmware.com/go/getplayer-linux
 
 	chmod +x getplayer-linux
 	sudo ./getplayer-linux
-	popd
+	popd > /dev/null
 
 	echo
 	echo "Open VMWare and make sure setup is complete in the UI"
@@ -626,12 +631,12 @@ install_noip() {
 	LOCAL_FILE=noip-duc-linux.tar.gz
 
 	mkdir -p $INSTALL_DIR
-	pushd $INSTALL_DIR
+	pushd $INSTALL_DIR > /dev/null
 	wget -O $LOCAL_FILE $TAR_FILE
 	tar xvzf $LOCAL_FILE
 	rm $LOCAL_FILE
 
-	pushd $(ls)
+	pushd $(ls) > /dev/null
 
 	# Make started to give some problems with a 'sprintf overflow'
 	# error; skipping seems ok
@@ -721,6 +726,32 @@ install_electrum() {
 	echo "Finished installing Electrum. Restart shell and check with '\$ electrum --version'" 
 }
 
+install_zap_wallet() {
+	echo_label "Zap Desktop"
+
+
+	VERSION="v0.7.2-beta"
+	FILE="Zap-linux-x86_64-$VERSION.AppImage"
+	INSTALL_DIR="$HOME/Installs"
+	URL=https://github.com/LN-Zap/zap-desktop/releases/download/$VERSION/$FILE
+	echo "Installing hardcoded version '$VERSION'"
+
+	mkdir -p $INSTALL_DIR
+	pushd $INSTALL_DIR > /dev/null
+	wget $URL
+
+	sudo chmod +x $FILE
+	popd > /dev/null
+
+	# Add to aliases
+	append_to_bash_aliases \
+		"" \
+		"# Zap Wallet" \
+		"alias zap=\"$INSTALL_DIR/$FILE\""
+
+	echo "Finished installing, restart shell and run '$ zap' to execute"
+}
+
 install_chromium() {
 	echo_label "Chromium Browser"
 
@@ -780,8 +811,9 @@ add_ed25519_ssh_key() {
 # install_noip
 # install_expressvpn
 # install_wireguard
-# install_chromium
 # install_electrum
+# install_zap_wallet
+# install_chromium
 # install_qbittorrent
 # configure_git
 # add_ed25519_ssh_key
