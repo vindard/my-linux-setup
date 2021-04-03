@@ -9,6 +9,12 @@ check_dependency() {
 	done
 }
 
+check_flatpak() {
+	if ! check_dependency flatpak; then
+		install_flatpak || return 1
+	fi
+}
+
 echo_label() {
 	echo && echo "Installing $1" && echo "---" && echo
 }
@@ -252,9 +258,9 @@ install_tor_browser() {
 	echo_label "Tor Browser"
 
 	# Guide: https://itsfoss.com/install-tar-browser-linux/
-	if ! check_dependency flatpak
-	then
-		install_flatpak
+	if ! check_flatpak; then
+		echo "Couldn't find/install flatpak, skipping rest of install"
+		return 1
 	fi
 
 	flatpak install -y flathub com.github.micahflee.torbrowser-launcher || \
@@ -268,13 +274,13 @@ install_tor() {
 
 	TOR_URL="https://deb.torproject.org/torproject.org"
 
-	append_to_sources_list \
-		"deb $TOR_URL buster main" \
-		"deb-src $TOR_URL buster main"
-
 	sudo apt update && sudo apt install -y \
 		dirmngr \
 		apt-transport-https
+
+	append_to_sources_list \
+		"deb $TOR_URL buster main" \
+		"deb-src $TOR_URL buster main"
 
 	PGP_KEY="A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89"
 	curl $TOR_URL/$PGP_KEY.asc | gpg --import
@@ -304,9 +310,9 @@ install_tor() {
 install_obsidian() {
 	echo_label "Obsidian"
 
-	if ! check_dependency flatpak
-	then
-		install_flatpak
+	if ! check_flatpak; then
+		echo "Couldn't find/install flatpak, skipping rest of install"
+		return 1
 	fi
 
 	flatpak install -y flathub md.obsidian.Obsidian || \
@@ -617,6 +623,22 @@ install_qbittorrent() {
 	sudo apt update && sudo apt install -y qbittorrent
 }
 
+install_peek_gif_recorder() {
+	echo_label "peek (GIF screen recorder)"
+
+	if ! check_flatpak; then
+		echo "Couldn't find/install flatpak, skipping rest of install"
+		return 1
+	fi
+
+	if flatpak install -y flathub com.uploadedlobster.peek; then
+		flatpak run com.uploadedlobster.peek
+	else
+		echo "If download was interrupted run: '$ flatpak repair --user'"
+	fi
+
+}
+
 install_gparted() {
 	echo_label "GParted"
 
@@ -747,7 +769,7 @@ install_zap_wallet() {
 	append_to_bash_aliases \
 		"" \
 		"# Zap Wallet" \
-		"alias zap=\"$INSTALL_DIR/$FILE\""
+		"alias zap=\"$INSTALL_DIR/$FILE && exit\""
 
 	echo "Finished installing, restart shell and run '$ zap' to execute"
 }
@@ -758,6 +780,13 @@ install_chromium() {
 	sudo apt update && sudo apt install -y chromium-browser
 }
 
+
+install_hdparm() {
+	echo_label "hdparm"
+
+	sudo apt update && sudo apt install -y \
+		hdparm
+}
 configure_git() {
 	echo_label "git configuration"
 
@@ -814,7 +843,9 @@ add_ed25519_ssh_key() {
 # install_electrum
 # install_zap_wallet
 # install_chromium
+# install_hdparm
 # install_qbittorrent
+# install_peek_gif_recorder
 # configure_git
 # add_ed25519_ssh_key
 
