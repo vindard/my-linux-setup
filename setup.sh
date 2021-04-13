@@ -639,6 +639,22 @@ install_peek_gif_recorder() {
 
 }
 
+install_dropbox() {
+	echo_label "Dropbox"
+
+	# cd $HOME && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+
+	# echo "Starting Dropbox"
+	# echo "---"
+	# $HOME/.dropbox-dist/dropboxd
+
+	# Add to aliases
+	append_to_bash_aliases \
+		"" \
+		"# Dropbox" \
+		"alias dropbox=\"$HOME/.dropbox-dist/dropboxd\""
+}
+
 install_gparted() {
 	echo_label "GParted"
 
@@ -748,6 +764,45 @@ install_electrum() {
 	echo "Finished installing Electrum. Restart shell and check with '\$ electrum --version'" 
 }
 
+install_udev_deps() {
+	sudo apt update && sudo apt install -y \
+		libusb-1.0-0-dev \
+		libudev-dev
+
+	sudo groupadd plugdev
+	sudo usermod -aG plugdev $(whoami)
+}
+
+install_trezor_udev() {
+	echo_label "Trezor Hardware wallet"
+	install_udev_deps
+
+	python3 -m pip install trezor[hidapi]
+
+	cat << 'EOF' | sudo tee /etc/udev/rules.d/51-trezor.rules
+# Trezor: The Original Hardware Wallet
+# https://trezor.io/
+#
+# Put this file into /etc/udev/rules.d
+#
+# If you are creating a distribution package,
+# put this into /usr/lib/udev/rules.d or /lib/udev/rules.d
+# depending on your distribution
+
+# Trezor
+SUBSYSTEM=="usb", ATTR{idVendor}=="534c", ATTR{idProduct}=="0001", MODE="0660", GROUP="plugdev", TAG+="uaccess", TAG+="udev-acl", SYMLINK+="trezor%n"
+KERNEL=="hidraw*", ATTRS{idVendor}=="534c", ATTRS{idProduct}=="0001", MODE="0660", GROUP="plugdev", TAG+="uaccess", TAG+="udev-acl"
+
+# Trezor v2
+SUBSYSTEM=="usb", ATTR{idVendor}=="1209", ATTR{idProduct}=="53c0", MODE="0660", GROUP="plugdev", TAG+="uaccess", TAG+="udev-acl", SYMLINK+="trezor%n"
+SUBSYSTEM=="usb", ATTR{idVendor}=="1209", ATTR{idProduct}=="53c1", MODE="0660", GROUP="plugdev", TAG+="uaccess", TAG+="udev-acl", SYMLINK+="trezor%n"
+KERNEL=="hidraw*", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="53c1", MODE="0660", GROUP="plugdev", TAG+="uaccess", TAG+="udev-acl"
+EOF
+
+	sudo udevadm control --reload-rules && \
+		sudo udevadm trigger
+}
+
 install_zap_wallet() {
 	echo_label "Zap Desktop"
 
@@ -841,11 +896,13 @@ add_ed25519_ssh_key() {
 # install_expressvpn
 # install_wireguard
 # install_electrum
+# install_trezor_udev
 # install_zap_wallet
 # install_chromium
 # install_hdparm
 # install_qbittorrent
 # install_peek_gif_recorder
+# install_dropbox
 # configure_git
 # add_ed25519_ssh_key
 
