@@ -246,6 +246,21 @@ install_vmware() {
 	echo
 }
 
+install_windows_networking() {
+	# Guide at: https://www.howtogeek.com/176471/how-to-share-files-between-windows-and-linux/
+	echo_label "Windows Networking"
+
+	sudo apt update && sudo apt install -y \
+		cifs-utils
+
+	echo "---"
+	echo
+	echo "Make a new dir and mount the Windows share to it like this:"
+	echo "$ mkdir $HOME/Shared-Documents"
+	echo "$ sudo mount.cifs //WindowsPC/Shared-Documents $HOME/Shared-Documents -o user=<Windows user here>"
+	echo
+}
+
 install_1password() {
 	echo_label "1password"
 
@@ -534,6 +549,22 @@ install_golang() {
 	# To uninstall, simply delete the created directory '/usr/local/go' and
 	# remove the 'go' binary from being added to $PATH
 	# Instructions: https://golang.org/doc/manage-install#linux-mac-bsd
+}
+
+install_awscli() {
+	echo_label "AWS CLI"
+
+	sudo apt update && sudo apt install -y \
+		awscli
+
+	if aws --version; then
+		echo "AWS CLI installed"
+		echo
+		echo "Configure using the following command:"
+		echo "$ aws configure"
+	else
+		echo "Error: double-check that '$ aws' command works"
+	fi
 }
 
 test_lines() {
@@ -885,6 +916,7 @@ add_ed25519_ssh_key() {
 # install_pyenv
 # install_thefuck
 # install_golang
+# install_awscli
 # install_yubikey
 # install_slack
 # install_spotify
