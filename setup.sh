@@ -907,6 +907,7 @@ add_ed25519_ssh_key() {
 # install_signal
 # install_virtualbox
 # install_vmware
+# install_windows_networking
 # install_1password
 # install_tor_browser
 # install_tor
