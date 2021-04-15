@@ -554,9 +554,37 @@ install_golang() {
 install_awscli() {
 	echo_label "AWS CLI"
 
-	sudo apt update && sudo apt install -y \
-		awscli
+	VIRTUALENV="awscli"
+	INSTALL_DIRNAME="aws-cli"
+	REPO=https://github.com/aws/$INSTALL_DIRNAME.git
 
+	# Fetch install files
+	git clone $REPO
+	pushd $INSTALL_DIRNAME > /dev/null
+	git checkout v2
+
+	# Check virtualenv dependency
+	if check_dependency pyenv; then
+		echo "Creating '$VIRTUALENV' virtualenv with pyenv"
+		pyenv virtualenv $VIRTUALENV
+		pyenv local $VIRTUALENV
+		pip install --upgrade pip
+	else
+		echo 
+		read -p "No 'pyenv' found, would you like to proceed with system Python? (Y/n): " RESP
+		echo
+		if [[ $RESP == 'N' ]] || [[ $RESP == 'n' ]]; then
+			echo "Skipping rest of awscli install..."
+			return 1
+		fi
+	fi
+
+	# Install awscli
+	pip3 install -r requirements.txt
+	pip3 install .
+
+	echo
+	echo "Checking for 'aws' binary..."
 	if aws --version; then
 		echo "AWS CLI installed"
 		echo
@@ -564,6 +592,19 @@ install_awscli() {
 		echo "$ aws configure"
 	else
 		echo "Error: double-check that '$ aws' command works"
+		return 1
+	fi
+
+	# Cleanup
+	popd > /dev/null
+	rm -rf $INSTALL_DIRNAME
+
+	# Add to aliases
+	if check_dependency pyenv; then
+		append_to_bash_aliases \
+			"" \
+			"# AWS CLI virtualenv" \
+			"alias aws=\"$HOME/.pyenv/versions/$VIRTUALENV/bin/aws\""
 	fi
 }
 
