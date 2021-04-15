@@ -124,7 +124,7 @@ install_vscode_apt() {
 
 	wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
 	sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
-	rm packages.microsoft.gpg 
+	rm packages.microsoft.gpg
 	sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
 
 	sudo apt install apt-transport-https
@@ -455,7 +455,7 @@ install_pyenv() {
 	if ! command -v pyenv >/dev/null 2>&1
 	then
 		curl -L $SCRIPT | bash && \
-		cat << 'EOF' >> $HOME/.commonrc 
+		cat << 'EOF' >> $HOME/.commonrc
 
 # For pyenv
 # Comment one of the following blocks
@@ -570,7 +570,7 @@ install_awscli() {
 		pyenv local $VIRTUALENV
 		pip install --upgrade pip
 	else
-		echo 
+		echo
 		read -p "No 'pyenv' found, would you like to proceed with system Python? (Y/n): " RESP
 		echo
 		if [[ $RESP == 'N' ]] || [[ $RESP == 'n' ]]; then
@@ -609,7 +609,7 @@ install_awscli() {
 }
 
 test_lines() {
-	cat << 'EOF' >> $HOME/.commonrc 
+	cat << 'EOF' >> $HOME/.commonrc
 
 # For pyenv
 # Comment one of the following blocks
@@ -833,7 +833,7 @@ install_electrum() {
 	fi
 
 	echo
-	echo "Finished installing Electrum. Restart shell and check with '\$ electrum --version'" 
+	echo "Finished installing Electrum. Restart shell and check with '\$ electrum --version'"
 }
 
 install_udev_deps() {
