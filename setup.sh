@@ -349,7 +349,7 @@ install_docker_compose() {
 	echo_label "Docker Compose"
 
 	echo "Checking that Docker dependency is installed..."
-	if ! command -v "docker"
+	if ! check_dependency docker
 	then
 		echo "Docker not found, install first and then retry"
 		return 1
@@ -551,6 +551,19 @@ install_golang() {
 	# Instructions: https://golang.org/doc/manage-install#linux-mac-bsd
 }
 
+install_gitian_bitcoin_deps() {
+	echo_label "dependencies for gitian bitcoin builds"
+
+	sudo apt update && sudo apt install -y \
+		apt-cacher-ng \
+		coreutils \
+		ruby
+
+	if ! check_dependency docker; then
+		install_docker
+	fi
+}
+
 install_awscli() {
 	echo_label "AWS CLI"
 
@@ -714,11 +727,11 @@ install_peek_gif_recorder() {
 install_dropbox() {
 	echo_label "Dropbox"
 
-	# cd $HOME && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+	cd $HOME && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
 
-	# echo "Starting Dropbox"
-	# echo "---"
-	# $HOME/.dropbox-dist/dropboxd
+	echo "Starting Dropbox"
+	echo "---"
+	$HOME/.dropbox-dist/dropboxd
 
 	# Add to aliases
 	append_to_bash_aliases \
@@ -958,6 +971,7 @@ add_ed25519_ssh_key() {
 # install_pyenv
 # install_thefuck
 # install_golang
+# install_gitian_bitcoin_deps
 # install_awscli
 # install_yubikey
 # install_slack
