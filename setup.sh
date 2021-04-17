@@ -165,6 +165,26 @@ install_magic_wormhole() {
 			magic-wormhole
 }
 
+install_plex_server() {
+	# Install repo setup dependencies
+	sudo apt update && sudo apt install -y \
+		apt-transport-https \
+		ca-certificates \
+		curl
+
+	# Import repo PGP keys
+	curl https://downloads.plex.tv/plex-keys/PlexSign.key \
+		| sudo apt-key add -
+
+	# Add new repo to sources and update
+	echo deb https://downloads.plex.tv/repo/deb public main \
+		| sudo tee /etc/apt/sources.list.d/plexmediaserver.list
+	sudo apt update
+
+	# Install plex
+	sudo apt install -y plexmediaserver
+}
+
 install_fish() {
 	echo_label "fish shell"
 
