@@ -849,6 +849,43 @@ install_electrum() {
 	echo "Finished installing Electrum. Restart shell and check with '\$ electrum --version'"
 }
 
+install_sparrow_wallet() {
+	echo_label "Sparrow Wallet"
+
+	VERSION="1.3.2"
+	DOWNLOAD_URL_PRE="https://github.com/sparrowwallet/sparrow/releases/download/$VERSION"
+
+	pushd /tmp
+	curl https://keybase.io/craigraw/pgp_keys.asc | gpg --import
+
+	wget $DOWNLOAD_URL_PRE/sparrow_$VERSION-1_amd64.deb
+	wget $DOWNLOAD_URL_PRE/sparrow-$VERSION-manifest.txt
+	wget $DOWNLOAD_URL_PRE/sparrow-$VERSION-manifest.txt.asc
+
+	echo
+	echo "Running gpg sig checks"
+	echo "---"
+	gpg --verify sparrow-$VERSION-manifest.txt.asc
+
+	echo
+	echo "Running sha256 checksum checks"
+	echo "---"
+	sha256sum --check sparrow-$VERSION-manifest.txt --ignore-missing
+	echo
+	read -p "Do checks look ok to continue? (Y/n): " RESP
+	echo
+	if [[ $RESP == 'Y' ]] || [[ $RESP == 'y' ]]
+	then
+		echo "Starting 'Sparrow' install"
+	else
+		echo "Skipping rest of 'Sparrow' install"
+		echo
+		return 1
+	fi
+
+	sudo apt install ./sparrow_$VERSION-1_amd64.deb
+}
+
 install_udev_deps() {
 	sudo apt update && sudo apt install -y \
 		libusb-1.0-0-dev \
@@ -984,6 +1021,7 @@ add_ed25519_ssh_key() {
 # install_expressvpn
 # install_wireguard
 # install_electrum
+# install_sparrow_wallet
 # install_trezor_udev
 # install_zap_wallet
 # install_chromium
