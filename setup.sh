@@ -143,13 +143,35 @@ install_vscode_snap() {
 }
 
 install_speedtest() {
-	echo_label "speedtest"
+	echo_label "speedtest for Ubuntu/Pop!_OS"
 
-	sudo apt install -y gnupg1 apt-transport-https dirmngr
-	export INSTALL_KEY=379CE192D401AB61
-	sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $INSTALL_KEY
-	echo "deb https://ookla.bintray.com/debian generic main" | sudo tee  /etc/apt/sources.list.d/speedtest.list
-	sudo apt update
+	REPO_SETUP_SCRIPT=install.deb.sh
+
+	# Fetch script
+	wget https://install.speedtest.net/app/cli/$REPO_SETUP_SCRIPT
+	chmod +x $REPO_SETUP_SCRIPT
+
+	# Hack script to work with Pop!_OS
+	OS_RELEASE_ID=$(grep "^ID=" /etc/os-release | cut -d '=' -f 2- | sed 's|"||g')
+	if [[ "$OS_RELEASE_ID" == "pop" ]]; then
+		sed -i "s/^SUPPORTED=false/SUPPORT=true/g" $REPO_SETUP_SCRIPT
+		export os="ubuntu"
+		export dist=$(lsb_release -c | cut -f2)
+	fi
+
+	# Setup speedtest repo
+	sudo ./$REPO_SETUP_SCRIPT
+
+	# Cleanup
+	rm $REPO_SETUP_SCRIPT
+
+
+	# INSTALL
+
+	## If migrating from prior bintray install instructions please first...
+	# sudo rm /etc/apt/sources.list.d/speedtest.list
+	# sudo apt-get update
+	# sudo apt-get remove speedtest
 
 	# Other non-official binaries will conflict with Speedtest CLI
 	# Example how to remove using apt-get
