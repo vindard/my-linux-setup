@@ -183,6 +183,15 @@ install_plex_server() {
 
 	# Install plex
 	sudo apt install -y plexmediaserver
+
+	# Configure firewall rules
+	# Steps from: https://gist.github.com/nmaggioni/45dcca7695d37e6109276b1a6ad8c9c9
+	PLEX_UFW_RULES=/etc/ufw/applications.d/plexmediaserver
+	sudo cp configs/plexmediaserver.ufw $PLEX_UFW_RULES
+	sudo chown root: $PLEX_UFW_RULES
+
+	sudo ufw app update plexmediaserver
+	sudo ufw allow plexmediaserver-all
 }
 
 install_transmission() {
