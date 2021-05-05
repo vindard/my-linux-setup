@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# A script I made to act as a cli tool for working
+# with wireguard. It allows for basic start.stop and
+# listing of already configured interfaces
+
+start() {
+	if [[ -z $1 ]] || ! list | grep -q $1; then
+        echo "Please pass one of the following interfaces to 'start':"
+        list
+    else
+        sudo wg-quick up $1
+    fi
+}
+
+stop() {
+    if [[ -z $1 ]] || ! list | grep -q $1; then
+        echo "Please pass one of the following interfaces to 'stop':"
+        list
+    else
+        sudo wg-quick down $1
+    fi
+}
+
+show() {
+    sudo wg
+}
+
+list() {
+    sudo ls -l /etc/wireguard | \
+        grep .conf | \
+        sed "s/.* \(\w*\).conf/\1/g"
+}
+
+help() {
+    cat << EOF
+usage: ./run-wireguard [--help] [start] [stop] [show]
+       <command> [<args>]
+
+These are the commands to work with dev containers:
+
+   start             Start the VPN with the passed config
+   stop              Stop the VPN with the passed config
+   show              Show status of VPN
+   list              List all valid VPN interfaces tp pass to 'start' and 'stop'
+
+EOF
+}
+
+all_args=("$@")
+rest_args_array=("${all_args[@]:1}")
+rest_args="${rest_args_array[@]}"
+
+case $1 in
+    "start" )
+        start $rest_args
+        ;;
+    "stop" )
+        stop $rest_args
+        ;;
+    "show" )
+        show $rest_args
+        ;;
+    "list" )
+        list
+        ;;
+    "--help" )
+        help
+        ;;
+    * )
+        help
+        ;;
+esac
+
