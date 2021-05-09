@@ -950,6 +950,13 @@ install_wireguard() {
 	echo
 }
 
+install_zbar() {
+	echo_label "Zbar tools (bar code reader)"
+
+	sudo apt update && sudo apt install -y \
+		zbar-tools
+}
+
 install_electrum() {
 	echo_label "Electrum"
 
@@ -982,6 +989,9 @@ install_electrum() {
 
 	rm $BASE_FILE*
 	$HOME/.local/bin/electrum version --offline
+
+	echo && "Installing ZBar for QR code scanning from Electrum..."
+	install_zbar
 
 	# Add binary to $PATH
 	COMMONRC=$HOME/.commonrc
@@ -1171,6 +1181,7 @@ add_ed25519_ssh_key() {
 # install_noip
 # install_expressvpn
 # install_wireguard
+# install_zbar
 # install_electrum
 # install_sparrow_wallet
 # install_trezor_udev
