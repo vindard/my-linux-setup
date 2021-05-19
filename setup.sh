@@ -22,6 +22,23 @@ echo_label() {
 append_to_file() {
 	if [[ -e $FILE ]]; then
 		for line in "$@"; do
+			if [[ -z $line ]] || ! cat $FILE | grep -q "$line"; then
+				echo "$line" | tee -a $FILE > /dev/null
+			fi
+		done
+
+		# Delete all trailing blank lines at end of file
+		# (https://unix.stackexchange.com/a/81687)
+		sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $FILE
+		echo | tee -a $FILE > /dev/null
+	else
+		echo "Cannot append to '$FILE', file does not exist"
+	fi
+}
+
+su_append_to_file() {
+	if [[ -e $FILE ]]; then
+		for line in "$@"; do
 			if [[ -z $line ]] || ! sudo cat $FILE | grep -q "$line"; then
 				echo "$line" | sudo tee -a $FILE > /dev/null
 			fi
@@ -38,16 +55,21 @@ append_to_file() {
 
 append_to_sources_list() {
 	FILE="/etc/apt/sources.list"
-	append_to_file "$@"
+	su_append_to_file "$@"
 }
 
 append_to_torrc() {
 	FILE="/etc/tor/torrc"
-	append_to_file "$@"
+	su_append_to_file "$@"
 }
 
 append_to_bash_aliases() {
 	FILE="$HOME/.bash_aliases"
+	append_to_file "$@"
+}
+
+append_to_commonrc() {
+	FILE="$HOME/.commonrc"
 	append_to_file "$@"
 }
 
@@ -304,13 +326,13 @@ install_transmission() {
 
     # Setup alias
 	FILE="/home/$TSM_USER/.bashrc"
-	append_to_file \
+	su_append_to_file \
         "" \
         "# Transmission alias" \
         "alias tsm='transmission-remote --auth $TSM_USER:$TSM_PASS'"
 
 	FILE="/home/$TSM_USER/.zshrc"
-	append_to_file \
+	su_append_to_file \
         "" \
         "# Transmission alias" \
         "alias tsm='transmission-remote --auth $TSM_USER:$TSM_PASS'"
@@ -639,6 +661,69 @@ EOF
 	echo
 	echo "Note: IPython 7.19.0 has a tab autocompletion bug that is fixed by doing this: https://github.com/ipython/ipython/issues/12745#issuecomment-751892538"
 	echo
+}
+
+install_nodenv() {
+	echo_label "nodenv"
+
+	NODENV_DIR="$HOME/.nodenv"
+
+	if command -v nodenv >/dev/null 2>&1; then
+		echo "'nodenv' already installed, skipping install steps..."
+		return 0
+	fi
+
+
+	# Fetch from github & build
+	echo "Fetching from github repo..." && echo
+	rm -rf $NODENV_DIR
+	git clone https://github.com/nodenv/nodenv.git $NODENV_DIR
+	pushd $NODENV_DIR > /dev/null
+	src/configure && make -C src
+
+	append_to_commonrc \
+		"" \
+		"# For nodenv" \
+		'export PATH="$HOME/.nodenv/bin:$PATH"' \
+		'eval "$(nodenv init -)"'
+
+
+	# PLUGINS
+	# -------------
+	NODENV_PLUGINS_DIR="$NODENV_DIR/plugins"
+	mkdir -p $NODENV_DIR/plugins
+
+	# Plugin: 'node-build'
+	# This provides the '$ nodenv install' command that simplifies
+	# the process of installing new Node versions
+	PLUGIN_NAME="node-build"
+	PLUGIN_URL="https://github.com/nodenv/$PLUGIN_NAME.git"
+	git clone \
+		$PLUGIN_URL \
+		"$NODENV_PLUGINS_DIR/$PLUGIN_NAME"
+
+	# Plugin: 'node-package-rehash'
+	# This plugin aut rehashes module after install so that they are
+	# available from the terminal
+	PLUGIN_NAME="nodenv-package-rehash"
+	PLUGIN_URL="https://github.com/nodenv/$PLUGIN_NAME.git"
+	git clone \
+		$PLUGIN_URL \
+		"$NODENV_PLUGINS_DIR/$PLUGIN_NAME"
+
+
+	# VERIFY INSTALL
+	# -------------
+	NODENV_DOCTOR="$HOME/nodenv-doctor"
+	echo
+	echo "Install complete"
+	echo "====="
+	echo "Fetch and run the following script to check to installation:"
+	echo '   $ exec "$SHELL"'
+	echo "   $ curl -fsSL https://github.com/nodenv/nodenv-installer/raw/master/bin/nodenv-doctor > $NODENV_DOCTOR"
+	echo "   $ chmod u+x $NODENV_DOCTOR"
+	echo "   $ $NODENV_DOCTOR"
+	echo "   $ rm $NODENV_DOCTOR"
 }
 
 install_thefuck() {
@@ -1167,6 +1252,7 @@ add_ed25519_ssh_key() {
 # install_sensors
 # install_docker
 # install_pyenv
+# install_nodenv
 # install_thefuck
 # install_golang
 # install_gitian_bitcoin_deps
