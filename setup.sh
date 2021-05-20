@@ -397,6 +397,12 @@ install_virtualbox() {
 	sudo apt update && sudo apt install -y virtualbox
 }
 
+install_cheese() {
+	# Linux tool for streaming webcam
+	echo_label "Cheese"
+
+	sudo apt update && sudo apt install -y cheese
+}
 install_vmware() {
 	echo_label "VMWare"
 
@@ -1243,6 +1249,7 @@ add_ed25519_ssh_key() {
 # install_telegram
 # install_signal
 # install_virtualbox
+# install_cheese
 # install_vmware
 # install_windows_networking
 # install_1password
