@@ -1037,7 +1037,20 @@ install_wireguard() {
 	echo "Generating wireguard keys"
 	wg genkey | sudo tee $WIREGUARD_DIR/privatekey | wg pubkey | sudo tee $WIREGUARD_DIR/publickey
 	echo "Keys generated at $WIREGUARD_DIR"
-	echo "Finished installing wireguard, configure the 'wgo0.conf' file at $WIREGUARD_DIR to use"
+	echo
+	echo "Finished installing wireguard:"
+	echo " > configure the 'wg0.conf' file at $WIREGUARD_DIR to use"
+	echo " > double-check the interface for PostUp and PostDown values"
+	echo " > Run '$ chmod 600 /etc/wireguard/wg0.conf'"
+	echo
+	echo "If this is acting as a host receiving connections:"
+	echo " > open port 51820"
+	echo " > add a ufw/firewall rule for 51820/udp"
+	echo "   \$ sudo ufw allow 51820/udp comment \"Allow incoming Wireguard VPN connections\""
+	echo " > follow Step 4 here to edit sysctl: https://jianjye.medium.com/how-to-fix-no-internet-issues-in-wireguard-ed8f4bdd0bd1"
+	echo
+	echo "Check if a connection was made by connecting to this server and using"
+	echo "the '\$ sudo wg' command."
 	echo
 }
 
