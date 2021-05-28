@@ -164,6 +164,19 @@ install_vscode_snap() {
 	sudo snap install code --classic
 }
 
+install_android_studio_snap() {
+	echo_label "Android Studio (via snap)"
+
+	if ! check_dependency java; then
+		echo_label "Java dependency (for Android Studio)"
+		sudo apt update && sudo apt install -y \
+			openjdk-11-jdk
+	fi
+
+	sudo snap install android-studio --classic
+	# Remove with: $ sudo snap remove android-studio
+}
+
 install_speedtest() {
 	echo_label "speedtest for Ubuntu/Pop!_OS"
 
@@ -1255,6 +1268,7 @@ add_ed25519_ssh_key() {
 # install_extraction_tools
 # install_vscode_apt
 # install_vscode_snap
+# install_android_studio_snap
 # install_speedtest
 # install_magic_wormhole
 # install_fish
