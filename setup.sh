@@ -1242,6 +1242,19 @@ install_hdparm() {
 	sudo apt update && sudo apt install -y \
 		hdparm
 }
+
+install_direnv() {
+	# Needed to run GaloyMoney/galoy repo
+	sudo apt update && sudo apt install -y \
+		direnv
+
+	append_to_commonrc \
+		"" \
+		"# For direnv" \
+		'eval "$(direnv hook zsh)"'
+
+}
+
 configure_git() {
 	echo_label "git configuration"
 
@@ -1311,6 +1324,7 @@ add_ed25519_ssh_key() {
 # install_qbittorrent
 # install_peek_gif_recorder
 # install_dropbox
+# install_direnv
 # configure_git
 # add_ed25519_ssh_key
 
