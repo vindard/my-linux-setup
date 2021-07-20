@@ -1258,8 +1258,19 @@ install_direnv() {
 configure_git() {
 	echo_label "git configuration"
 
-	git config --global user.name "vindard"
-	git config --global user.email "17693119+vindard@users.noreply.github.com"
+	GIT_USER="vindard"
+	GIT_EMAIL="17693119+vindard@users.noreply.github.com"
+	GLOBAL_GITIGNORE="$HOME/.gitignore"
+
+	git config --global user.name "$GIT_USER"
+	git config --global user.email "$GIT_EMAIL"
+	echo "Set global git username as '$GIT_USER' and email as '$GIT_EMAIL'"
+
+	if [[ ! -f $GLOBAL_GITIGNORE ]]; then
+		cp configs/.gitignore $GLOBAL_GITIGNORE
+	fi
+	git config --global core.excludesfile $GLOBAL_GITIGNORE
+	echo "Set global gitignore at '$GLOBAL_GITIGNORE'"
 
 	echo
 	echo "To import 'hot' signing keys fetch the following file and run:"
