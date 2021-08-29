@@ -1203,6 +1203,32 @@ EOF
 		sudo udevadm trigger
 }
 
+install_coldcard_udev() {
+	echo_label "Coldcard Hardware wallet"
+	install_udev_deps
+
+	python3 -m pip install ckcc-protocol
+
+	cat << 'EOF' | sudo tee /etc/udev/rules.d/51-coinkite.rules
+# Linux udev support file.
+#
+# This is a example udev file for HIDAPI devices which changes the permissions
+# to 0666 (world readable/writable) for a specific device on Linux systems.
+#
+# - Copy this file into /etc/udev/rules.d and unplug and re-plug your Coldcard.
+# - Udev does not have to be restarted.
+#
+# probably not needed:
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="d13e", ATTRS{idProduct}=="cc10", GROUP="plugdev", MODE="0666"
+# required:
+# from <https://github.com/signal11/hidapi/blob/master/udev/99-hid.rules>
+KERNEL=="hidraw*", ATTRS{idVendor}=="d13e", ATTRS{idProduct}=="cc10", GROUP="plugdev", MODE="0666"
+EOF
+
+	sudo udevadm control --reload-rules && \
+		sudo udevadm trigger
+}
+
 install_zap_wallet() {
 	echo_label "Zap Desktop"
 
