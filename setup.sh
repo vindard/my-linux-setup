@@ -1084,11 +1084,11 @@ install_electrum() {
 		6694D8DE7BE8EE5631BED9502BD5824B7F9470E6
 
 	# Fetch install files
-	VERSION=4.0.9
+	VERSION=4.1.5
 	BASE_FILE=Electrum-$VERSION.tar.gz
 	wget https://download.electrum.org/$VERSION/$BASE_FILE
-	wget https://download.electrum.org/$VERSION/$BASE_FILE.asc
-	gpg --verify $BASE_FILE.asc
+	wget https://download.electrum.org/$VERSION/$BASE_FILE.ThomasV.asc
+	gpg --verify $BASE_FILE.ThomasV.asc $BASE_FILE
 
 	# Install dependencies
 	sudo apt update && sudo apt install -y \
