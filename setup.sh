@@ -555,6 +555,25 @@ install_docker_compose() {
 	docker-compose --version
 }
 
+install_docker_compose_v2() {
+	echo_label "Docker Compose v2"
+
+	echo "Checking that Docker dependency is installed..."
+	if ! check_dependency docker
+	then
+		echo "Docker not found, install first and then retry"
+		return 1
+	fi
+
+	VERSION="v2.0.1"
+	URL="https://github.com/docker/compose/releases/download/$VERSION/docker-compose-linux-x86_64"
+
+	mkdir -p $HOME/.docker/cli-plugins/
+	sudo curl -SL $URL -o $HOME/.docker/cli-plugins/docker-compose
+	sudo chmod +x $HOME/.docker/cli-plugins/docker-compose
+	docker compose --version
+}
+
 install_docker() {
 	# Guide at: https://docs.docker.com/engine/install/ubuntu/
 	echo_label "Docker"
@@ -595,7 +614,7 @@ install_docker() {
 	docker run hello-world
 
 	# Install docker-compose
-	install_docker_compose
+	install_docker_compose_v2
 }
 
 install_pyenv() {
