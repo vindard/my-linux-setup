@@ -173,6 +173,9 @@ install_android_studio_snap() {
 			openjdk-11-jdk
 	fi
 
+	# Run the following to switch installed android versions:
+	# $ sudo update-alternatives --config java
+
 	sudo snap install android-studio --classic
 	# Remove with: $ sudo snap remove android-studio
 }
