@@ -180,6 +180,13 @@ install_android_studio_snap() {
 	# Remove with: $ sudo snap remove android-studio
 }
 
+install_scrcpy() {
+	echo_label "scrcpy (Android device mirroring tool)"
+
+	sudo apt update && sudo apt install -y \
+		scrcpy
+}
+
 install_speedtest() {
 	echo_label "speedtest for Ubuntu/Pop!_OS"
 
@@ -1341,6 +1348,7 @@ add_ed25519_ssh_key() {
 # install_vscode_apt
 # install_vscode_snap
 # install_android_studio_snap
+# install_scrcpy
 # install_speedtest
 # install_magic_wormhole
 # install_fish
