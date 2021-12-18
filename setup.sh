@@ -93,7 +93,7 @@ install_standard() {
 	echo_label "standard tools"
 
 	mkdir -p $HOME/Developer
-	touch $$HOME/.commonrc
+	touch $HOME/.commonrc
 
 	sudo apt update && sudo apt install -y \
 		htop \
