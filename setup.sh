@@ -171,6 +171,7 @@ install_android_studio_snap() {
 		echo_label "Java dependency (for Android Studio)"
 		sudo apt update && sudo apt install -y \
 			openjdk-11-jdk
+			# openjdk-8-jdk
 	fi
 
 	# Run the following to switch installed android versions:
