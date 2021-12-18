@@ -584,7 +584,7 @@ install_docker_compose_v2() {
 	mkdir -p $HOME/.docker/cli-plugins/
 	sudo curl -SL $URL -o $HOME/.docker/cli-plugins/docker-compose
 	sudo chmod +x $HOME/.docker/cli-plugins/docker-compose
-	docker compose --version
+	docker compose version
 }
 
 install_docker() {
