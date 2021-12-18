@@ -200,13 +200,15 @@ install_speedtest() {
 	# Hack script to work with Pop!_OS
 	OS_RELEASE_ID=$(grep "^ID=" /etc/os-release | cut -d '=' -f 2- | sed 's|"||g')
 	if [[ "$OS_RELEASE_ID" == "pop" ]]; then
-		sed -i "s/^SUPPORTED=false/SUPPORT=true/g" $REPO_SETUP_SCRIPT
-		export os="ubuntu"
-		export dist=$(lsb_release -c | cut -f2)
+		# sed -i "s/^SUPPORTED=false/SUPPORT=true/g" $REPO_SETUP_SCRIPT
+
+		# Setup speedtest repo
+		sudo os="ubuntu" dist=$(lsb_release -c | cut -f2) ./$REPO_SETUP_SCRIPT
+	else
+		# Setup speedtest repo
+		sudo ./$REPO_SETUP_SCRIPT
 	fi
 
-	# Setup speedtest repo
-	sudo ./$REPO_SETUP_SCRIPT
 
 	# Cleanup
 	rm $REPO_SETUP_SCRIPT
