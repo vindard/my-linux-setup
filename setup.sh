@@ -164,6 +164,16 @@ install_vscode_snap() {
 	sudo snap install code --classic
 }
 
+install_robo3t_snap() {
+	echo_label "Robo 3T for MongoDB (via snap)"
+
+	if ! check_dependency snap; then
+		install_snap
+	fi
+
+	sudo snap install robo3t-snap
+}
+
 install_android_studio_snap() {
 	echo_label "Android Studio (via snap)"
 
@@ -1350,6 +1360,7 @@ add_ed25519_ssh_key() {
 # install_extraction_tools
 # install_vscode_apt
 # install_vscode_snap
+# install_robo3t_snap
 # install_android_studio_snap
 # install_scrcpy
 # install_speedtest
