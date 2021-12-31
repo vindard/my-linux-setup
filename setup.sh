@@ -1005,6 +1005,12 @@ install_qbittorrent() {
 	sudo apt update && sudo apt install -y qbittorrent
 }
 
+install_simple_screen_recorder() {
+	echo_label "SimpleScreenRecorder"
+
+	sudo apt update && sudo apt install -y simplescreenrecorder
+}
+
 install_peek_gif_recorder() {
 	echo_label "peek (GIF screen recorder)"
 
@@ -1403,6 +1409,7 @@ add_ed25519_ssh_key() {
 # install_chromium
 # install_hdparm
 # install_qbittorrent
+# install_simple_screen_recorder
 # install_peek_gif_recorder
 # install_dropbox
 # install_direnv
