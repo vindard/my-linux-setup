@@ -455,6 +455,8 @@ install_vmware() {
 	sudo ./getplayer-linux
 	popd > /dev/null
 
+	# On latest Pop!_OS 21.10 I had to manually clone and make the foll:
+	# https://communities.vmware.com/t5/VMware-Workstation-Pro/Workstation-16-2-1-vmmon-amp-vmnet-not-compiling-on-Pop-OS-21-10/m-p/2885045/highlight/true#M173190
 	echo
 	echo "Open VMWare and make sure setup is complete in the UI"
 	echo "-----"
