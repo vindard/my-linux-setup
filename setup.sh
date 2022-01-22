@@ -174,6 +174,31 @@ install_robo3t_snap() {
 	sudo snap install robo3t-snap
 }
 
+install_dotnet() {
+	echo_label ".NET SDK"
+
+	# From: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2110-
+	PACKAGE_NAME="packages-microsoft-prod.deb"
+	wget https://packages.microsoft.com/config/ubuntu/21.04/$PACKAGE_NAME -O $PACKAGE_NAME
+	sudo dpkg -i $PACKAGE_NAME
+	rm $PACKAGE_NAME
+
+	sudo apt-get update; \
+		sudo apt-get install -y apt-transport-https && \
+		sudo apt-get update && \
+		sudo apt-get install -y dotnet-sdk-6.0
+
+	echo_label "ASP.NET Core Runtime"
+	sudo apt-get update; \
+		sudo apt-get install -y apt-transport-https && \
+		sudo apt-get update && \
+
+		# Install one of 'aspnetcore' or 'dotnet'
+		sudo apt-get install -y aspnetcore-runtime-6.0
+		# sudo apt-get install -y dotnet-runtime-6.0
+
+}
+
 install_android_studio_snap() {
 	echo_label "Android Studio (via snap)"
 
@@ -1369,6 +1394,7 @@ add_ed25519_ssh_key() {
 # install_vscode_apt
 # install_vscode_snap
 # install_robo3t_snap
+# install_dotnet
 # install_android_studio_snap
 # install_scrcpy
 # install_speedtest
