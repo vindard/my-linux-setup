@@ -1054,6 +1054,19 @@ install_peek_gif_recorder() {
 
 }
 
+install_obs() {
+	echo_label "OBS"
+
+	# Following from: https://obsproject.com/wiki/install-instructions#ubuntumint-installation
+	sudo apt update && sudo apt install -y \
+		ffmpeg \
+		v4l2loopback-dkms
+
+	sudo add-apt-repository ppa:obsproject/obs-studio
+	sudo apt update && sudo apt install -y \
+		obs-studio
+}
+
 install_dropbox() {
 	echo_label "Dropbox"
 
@@ -1439,6 +1452,7 @@ add_ed25519_ssh_key() {
 # install_qbittorrent
 # install_simple_screen_recorder
 # install_peek_gif_recorder
+# install_obs
 # install_dropbox
 # install_direnv
 # configure_git
