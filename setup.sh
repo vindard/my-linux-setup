@@ -1366,7 +1366,16 @@ install_direnv() {
 		"" \
 		"# For direnv" \
 		'eval "$(direnv hook zsh)"'
+}
 
+install_gcloud() {
+	echo_label "GCloud CLI (via snap)"
+
+	if ! check_dependency snap; then
+		install_snap
+	fi
+
+	sudo snap install google-cloud-cli --classic
 }
 
 configure_git() {
@@ -1455,6 +1464,7 @@ add_ed25519_ssh_key() {
 # install_obs
 # install_dropbox
 # install_direnv
+# install_gcloud
 # configure_git
 # add_ed25519_ssh_key
 
