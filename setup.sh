@@ -1378,6 +1378,13 @@ install_gcloud() {
 	sudo snap install google-cloud-cli --classic
 }
 
+install_ruby() {
+	echo_label "Ruby"
+
+	sudo apt update && sudo apt install -y \
+		ruby-full
+}
+
 configure_git() {
 	echo_label "git configuration"
 
@@ -1465,6 +1472,7 @@ add_ed25519_ssh_key() {
 # install_dropbox
 # install_direnv
 # install_gcloud
+# install_ruby
 # configure_git
 # add_ed25519_ssh_key
 
