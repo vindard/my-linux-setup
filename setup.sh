@@ -875,6 +875,15 @@ install_golang() {
 	# Instructions: https://golang.org/doc/manage-install#linux-mac-bsd
 }
 
+install_rust() {
+	echo_label "Rust"
+
+	# Instructions from: https://www.rust-lang.org/tools/install
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+	# Uninstall with: `$ rustup self uninstall``
+}
+
 install_gitian_bitcoin_deps() {
 	echo_label "dependencies for gitian bitcoin builds"
 
@@ -1446,6 +1455,7 @@ add_ed25519_ssh_key() {
 # install_nodenv
 # install_thefuck
 # install_golang
+# install_rust
 # install_gitian_bitcoin_deps
 # install_awscli
 # install_yubikey
