@@ -875,6 +875,14 @@ install_golang() {
 	# Instructions: https://golang.org/doc/manage-install#linux-mac-bsd
 }
 
+install_clang() {
+	echo_label "clang"
+
+	# Instructions from: https://www.addictivetips.com/ubuntu-linux-tips/clang-on-ubuntu/
+	sudo apt update && sudo apt install -y \
+		clang
+}
+
 install_rust() {
 	echo_label "Rust"
 
@@ -1455,6 +1463,7 @@ add_ed25519_ssh_key() {
 # install_nodenv
 # install_thefuck
 # install_golang
+# install_clang
 # install_rust
 # install_gitian_bitcoin_deps
 # install_awscli
