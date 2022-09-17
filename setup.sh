@@ -751,6 +751,38 @@ EOF
 	echo
 }
 
+install_poetry() {
+	echo_label "Poetry"
+
+	if ! check_dependency python3; then
+		echo "'python3' missing, skipping Poetry install..."
+		return 1
+	fi
+
+	INSTALL_SCRIPT="/tmp/install-poetry.py"
+	curl -sSL https://install.python-poetry.org > "$INSTALL_SCRIPT"
+	echo "Downloaded .py install script to '$INSTALL_SCRIPT' via 'curl -sSL https://install.python-poetry.org'."
+	echo "Please open in another tab and confirm."
+	read -p "Continue? (Y/n): " RESP
+	if ! [[ $RESP == 'Y' ]] && ! [[ $RESP == 'y' ]]; then
+		echo "Skipping Poetry install..."
+		return 1
+	fi
+
+	# You can uninstall at any time by executing this script with the --uninstall option, and
+	# these changes will be reverted.
+	chmod +x "$INSTALL_SCRIPT"
+	python3 "$INSTALL_SCRIPT"
+	rm "$INSTALL_SCRIPT"
+
+	POETRY_PATH="$HOME/.local/bin"
+	if [ -z $(echo $PATH | grep $POETRY_PATH) ]; then
+		echo "Note: Need to add $POETRY_PATH to \$PATH in shell configs (.commonrc)"
+	fi
+
+	echo "Finished installing Poetry."
+}
+
 install_nodenv() {
 	echo_label "nodenv"
 
@@ -1460,6 +1492,7 @@ add_ed25519_ssh_key() {
 # install_sensors
 # install_docker
 # install_pyenv
+# install_poetry
 # install_nodenv
 # install_thefuck
 # install_golang
