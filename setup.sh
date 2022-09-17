@@ -225,42 +225,15 @@ install_scrcpy() {
 }
 
 install_speedtest() {
-	echo_label "speedtest for Ubuntu/Pop!_OS"
-
-	REPO_SETUP_SCRIPT=install.deb.sh
-
-	# Fetch script
-	wget https://install.speedtest.net/app/cli/$REPO_SETUP_SCRIPT
-	chmod +x $REPO_SETUP_SCRIPT
-
-	# Hack script to work with Pop!_OS
-	OS_RELEASE_ID=$(grep "^ID=" /etc/os-release | cut -d '=' -f 2- | sed 's|"||g')
-	if [[ "$OS_RELEASE_ID" == "pop" ]]; then
-		# sed -i "s/^SUPPORTED=false/SUPPORT=true/g" $REPO_SETUP_SCRIPT
-
-		# Setup speedtest repo
-		sudo os="ubuntu" dist=$(lsb_release -c | cut -f2) ./$REPO_SETUP_SCRIPT
-	else
-		# Setup speedtest repo
-		sudo ./$REPO_SETUP_SCRIPT
+	if ! check_dependency curl
+	then
+		sudo apt update && sudo apt install -y \
+			curl
 	fi
 
-
-	# Cleanup
-	rm $REPO_SETUP_SCRIPT
-
-
-	# INSTALL
-
-	## If migrating from prior bintray install instructions please first...
-	# sudo rm /etc/apt/sources.list.d/speedtest.list
-	# sudo apt-get update
-	# sudo apt-get remove speedtest
-
-	# Other non-official binaries will conflict with Speedtest CLI
-	# Example how to remove using apt-get
-	# sudo apt remove speedtest-cli
-	sudo apt install -y speedtest
+	REPO_SETUP_SCRIPT="https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh"
+	curl -s $REPO_SETUP_SCRIPT | sudo bash
+	sudo apt install speedtest
 }
 
 install_magic_wormhole() {
