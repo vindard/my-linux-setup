@@ -103,7 +103,8 @@ install_standard() {
 		git \
 		vnstat \
 		tmux \
-		nmap
+		nmap \
+		curl
 }
 
 install_extraction_tools() {
