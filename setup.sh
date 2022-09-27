@@ -178,6 +178,15 @@ install_robo3t_snap() {
 install_dotnet() {
 	echo_label ".NET SDK"
 
+	# From: https://github.com/dotnet/core/issues/7699
+	sudo apt update && sudo apt -y install \
+		dotnet6
+
+}
+
+install_dotnet_old() {
+	echo_label ".NET SDK"
+
 	# From: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2110-
 	PACKAGE_NAME="packages-microsoft-prod.deb"
 	wget https://packages.microsoft.com/config/ubuntu/21.04/$PACKAGE_NAME -O $PACKAGE_NAME
