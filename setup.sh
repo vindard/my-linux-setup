@@ -598,7 +598,7 @@ install_docker_compose_v2() {
 		return 1
 	fi
 
-	VERSION="v2.0.1"
+	VERSION="v2.23.3"
 	URL="https://github.com/docker/compose/releases/download/$VERSION/docker-compose-linux-x86_64"
 
 	mkdir -p $HOME/.docker/cli-plugins/
