@@ -1161,6 +1161,8 @@ install_expressvpn() {
 }
 
 install_wireguard() {
+	# Note: use pivpn to configure wireguard! https://www.pivpn.io/
+
 	echo_label "Wireguard"
 
 	sudo apt update && sudo apt install -y wireguard
