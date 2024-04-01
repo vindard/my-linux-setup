@@ -651,6 +651,21 @@ install_docker() {
 	# install_docker_compose_v2
 }
 
+install_portainer_container() {
+	# Guide at: https://docs.docker.com/engine/install/ubuntu/
+
+	# Ensure docker is installed first
+
+	sudo docker pull portainer/portainer-ce:latest
+
+    sudo docker run -d \
+		-p 9000:9000 \
+		--name=portainer \
+		--restart=always \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v portainer_data:/data portainer/portainer-ce:latest
+}
+
 install_pyenv() {
 	echo_label "pyenv"
 
@@ -1477,6 +1492,7 @@ add_ed25519_ssh_key() {
 # install_obsidian
 # install_sensors
 # install_docker
+# install_portainer_container
 # install_pyenv
 # install_poetry
 # install_nodenv
