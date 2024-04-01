@@ -647,7 +647,8 @@ install_docker() {
 	docker run hello-world
 
 	# Install docker-compose
-	install_docker_compose_v2
+	# Note: compose comes with docker now
+	# install_docker_compose_v2
 }
 
 install_pyenv() {
