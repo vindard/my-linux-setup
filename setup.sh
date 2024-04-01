@@ -666,6 +666,36 @@ install_portainer_container() {
 		-v portainer_data:/data portainer/portainer-ce:latest
 }
 
+install_omada_controller_container() {
+	# Guide at:
+	# - https://raw.githubusercontent.com/EddieDSuza/techwitheddie/main/omada.sh
+	# - via https://youtu.be/FcDNGcawi7Y?si=Zd7gqe0oYkJltmBQ
+
+	# Ensure docker is installed first
+
+	sudo docker volume create omada-data
+	sudo docker volume create omada-work
+	sudo docker volume create omada-logs
+
+	sudo docker run -d \
+		--name omada-controller \
+		--restart unless-stopped \
+		--net host \
+		-e MANAGE_HTTP_PORT=8088 \
+		-e MANAGE_HTTPS_PORT=8043 \
+		-e PORTAL_HTTP_PORT=8088 \
+		-e PORTAL_HTTPS_PORT=8843 \
+		-e SHOW_SERVER_LOGS=true \
+		-e SHOW_MONGODB_LOGS=false \
+		-e SSL_CERT_NAME="tls.crt" \
+		-e SSL_KEY_NAME="tls.key" \
+		-e TZ=America/Port_of_Spain \
+		-v omada-data:/opt/tplink/EAPController/data \
+		-v omada-work:/opt/tplink/EAPController/work \
+		-v omada-logs:/opt/tplink/EAPController/logs \
+		mbentley/omada-controller:latest
+}
+
 install_pyenv() {
 	echo_label "pyenv"
 
@@ -1493,6 +1523,7 @@ add_ed25519_ssh_key() {
 # install_sensors
 # install_docker
 # install_portainer_container
+# install_omada_controller_container
 # install_pyenv
 # install_poetry
 # install_nodenv
